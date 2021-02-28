@@ -3,10 +3,29 @@
 \usepackage{amssymb}
 \usepackage{amsmath}
 \begin{document}
+We choose $k = 2$ to be the new element that will be added to the basis. This is because $c_2 = 1 > 0$, and k is the smallest element that satisfies this constraint (Bland's rule)\\ 
+
+$t = min\{array([2.]), array([5.])\} = [2.]$ \\ 
+
+$x_B = b - tA_k = \begin{bmatrix}
+  2\\
+  5\\
+\end{bmatrix} - [2.]\begin{bmatrix}
+  1\\
+  1\\
+\end{bmatrix} = \begin{bmatrix}
+  0.\\
+  3.\\
+\end{bmatrix}$ \\
+
+This means that $r = 1$. This is the smallest 0-element index of the new $x_B$ (by choosing this element, we are adhering to Bland's rule)\\
+
+This means that our "better basis" is $B = \{1 3\}$. \\
+
 The LP: \\
- max $\begin{bmatrix}  
-  0 & 1 & 3 & 0\\      
-\end{bmatrix}x + 0$ \\ 
+ max $\begin{bmatrix}
+  0 & 1 & 3 & 0\\
+\end{bmatrix}x + 0$ \\
 
 s.t. \\
 $\begin{bmatrix}
@@ -18,7 +37,7 @@ $\begin{bmatrix}
 \end{bmatrix}$\\
 $x \geq\mathbb{O}$ \\
 
-Written in canonical form with the basis $B = \{1, 3\}$ is: \\ 
+Written in canonical form with the basis $B = \{1 3\}$ is: \\
 
 max $\begin{bmatrix}
   -1. & 0. & 1. & 0.\\
@@ -34,4 +53,58 @@ $\begin{bmatrix}
 \end{bmatrix}$\\
 $x \geq\mathbb{O}$ \\
 
+We choose $k = 3$ to be the new element that will be added to the basis. This is because $c_3 = 1. > 0$, and k is the smallest element that satisfies this constraint (Bland's rule)\\
+
+$t = min\{array([1.])\} = [1.]$ \\
+
+$x_B = b - tA_k = \begin{bmatrix}
+  2.\\
+  3.\\
+\end{bmatrix} - [1.]\begin{bmatrix}
+  2.\\
+  -1.\\
+\end{bmatrix} = \begin{bmatrix}
+  0.\\
+  4.\\
+\end{bmatrix}$ \\
+
+This means that $r = 2$. This is the smallest 0-element index of the new $x_B$ (by choosing this element, we are adhering to Bland's rule)\\
+
+This means that our "better basis" is $B = \{2 3\}$. \\
+
+The LP: \\
+ max $\begin{bmatrix}
+  -1. & 0. & 1. & 0.\\
+\end{bmatrix}x + 2.0$ \\
+
+s.t. \\
+$\begin{bmatrix}
+  1. & 1. & 2. & 0.\\
+  -1. & 0. & -1. & 1.\\
+\end{bmatrix}x = \begin{bmatrix}
+  2.\\
+  3.\\
+\end{bmatrix}$\\
+$x \geq\mathbb{O}$ \\
+
+Written in canonical form with the basis $B = \{2 3\}$ is: \\
+
+max $\begin{bmatrix}
+  -1.5 & -0.5 & 0. & 0.\\
+\end{bmatrix}x + 3.0$ \\
+
+s.t. \\
+$\begin{bmatrix}
+  0.5 & 0.5 & 1. & 0.\\
+  -0.5 & 0.5 & 0. & 1.\\
+\end{bmatrix}x = \begin{bmatrix}
+  1.\\
+  4.\\
+\end{bmatrix}$\\
+$x \geq\mathbb{O}$ \\
+
+STOP! $c_N = \begin{bmatrix}
+  -1.5\\
+  -0.5\\
+\end{bmatrix} \leq 0$. The basic solution $\bar{x}$ is optimal
 \end{document}

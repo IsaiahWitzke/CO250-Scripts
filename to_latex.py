@@ -16,3 +16,6 @@ def bmatrix(a):
     rv +=  [r'\end{bmatrix}']
     return '\n'.join(rv)
 
+def print_lp(A, b, c, z):
+    print('max $' + bmatrix(np.transpose(c)) + 'x + ' + z.__str__() + '$ \\\\ \n')
+    print('s.t. \\\\ \n\n$' + bmatrix(A) + 'x = ' + bmatrix(b) + '$\\\\ \n\n' + '$x \\geq\\mathbb{O}$ \\\\ \n\n')

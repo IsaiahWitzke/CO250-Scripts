@@ -13,14 +13,22 @@ def canonical(A, b, c, z, B):
     new_c = np.transpose(np.transpose(c) - np.transpose(y).dot(A))
     new_z = (np.transpose(y).dot(b) + z)[0,0]
     
-    print('The LP: \\\\ \n max $' + to_latex.bmatrix(np.transpose(c)) + 'x + ' + z.__str__() + '$ \\\\ \n')
-    print('s.t. \\\\ \n$' + to_latex.bmatrix(A) + 'x = ' + to_latex.bmatrix(b) + '$\\\\ \n' + '$x \\geq\\mathbb{O}$ \\\\ \n')
-    print('Written in canonical form with the basis $B = \{' +  B.__str__()[1:-1] + '\}$ is: \\\\ \n')
-    print('max $' + to_latex.bmatrix(np.transpose(new_c)) + 'x + ' + new_z.__str__() + '$ \\\\ \n')
-    print('s.t. \\\\ \n$' + to_latex.bmatrix(new_A) + 'x = ' + to_latex.bmatrix(new_b) + '$\\\\ \n' + '$x \\geq\\mathbb{O}$ \\\\ \n')
+    
+    #print('Written in canonical form with the basis $B = \{' +  B.__str__()[1:-1] + '\}$ is: \\\\ \n')
+    #print('max $' + to_latex.bmatrix(np.transpose(new_c)) + 'x + ' + new_z.__str__() + '$ \\\\ \n')
+    #print('s.t. \\\\ \n$' + to_latex.bmatrix(new_A) + 'x = ' + to_latex.bmatrix(new_b) + '$\\\\ \n' + '$x \\geq\\mathbb{O}$ \\\\ \n')
 
     return (new_A, new_b, new_c, new_z)
-    
+
+# sef = "Standard Equity Form"
+#  at the moment, just multiplies c by -1 if is_min == True
+#  TODO: figure out how to deal with inequalities and handling other weird things that may occur when trying to get into SEF
+def sef(A, b, c, z, is_min):
+    new_c = c
+    if(is_min):
+        new_c = -1 * new_c
+
+    return(A, b, new_c, z)
 
 """ tests
 A = np.array([
