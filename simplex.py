@@ -2,14 +2,23 @@ import canonical
 import numpy as np
 import to_latex
 
+class OptimalBasicSolution(Exception):
+    def __init__(self, B):
+        self.B = B
+        super().__init__()
+
+class UnboundedSolution(Exception):
+    pass
+
+class NoSolution(Exception):
+    pass
+
 # AKA, the major part of "PHASE 2" of simplex (requires that A, b, c, z, B are in canoncal form)
 def find_better_basis(A, b, c, z, B):
     all_elems = np.array(range(0, A.shape[1]))
     N = np.setxor1d(all_elems, B)
     c_N = c[N,:]
 
-    print(B)
-    
     # if cN <= 0, then stop, the basic solution x is optimal 
     c_N_leq_0 = True
     for c_N_elem in c_N:
@@ -17,9 +26,9 @@ def find_better_basis(A, b, c, z, B):
             c_N_leq_0 = False
     if(c_N_leq_0):
         print('STOP! $c_N = ' + to_latex.bmatrix(c_N) + ' \\leq 0$. The basic solution $\\bar{x}$ is optimal')
-        return
+        raise OptimalBasicSolution(B)
     
-    # pick  knot in B such that c_k > 0 and set x_k = t
+    # pick k not in B such that c_k > 0 and set x_k = t
     k = -1
     for i in range(0, c.size):
         if(i in B):
@@ -40,8 +49,8 @@ def find_better_basis(A, b, c, z, B):
             A_k_leq_0 = False
     if(A_k_leq_0):
         print('STOP! $A_k = ' + to_latex.bmatrix(A_k) + ' \\leq 0$. The LP is unbounded')
-        # TODO: print out "certificate"
-        return
+        # TODO: print out the "certificate"
+        raise UnboundedSolution()
     
     # choose t to be the min of some stuff...
     possible_t_vals = []
@@ -80,9 +89,41 @@ def find_better_basis(A, b, c, z, B):
     return better_B
 
 
-# TODO: implement me (this is the part that has to do with the auxiliary variables)
-def simplex_pt_1(A, b, c, z, B):
-    return 0
+def find_optimal_solution(A, b, c, z, B):
+    try:
+        while(True):
+            B = find_better_basis(A, b, c, z, B)
+            A, b, c, z = canonical.canonical(A, b, c, z, B)
+            to_latex.print_lp(A, b, c, z)
+    except OptimalBasicSolution as soln:
+        return (A, b, c, z, B)
+
+def find_feasible_basis(A, b):
+    aux_variables = np.eye(A.shape[0])
+    A_with_aux = np.append(A, aux_variables, axis=1)
+    B = np.array(range(A.shape[1], A_with_aux.shape[1]))
+    # neg to turn the "min x_4 + x_5" into a "max -x_4 - x_5"
+    aux_c = -1 * np.array([np.append(
+        np.zeros((1, A.shape[1])),
+        np.ones((1, A.shape[0]))
+    )]).T
+    z = 0
+    bfs = np.append(np.zeros((1, A.shape[1])), np.transpose(b))
+    print('We now have the auxiliary LP\\\\ \\n')
+    to_latex.print_lp(A_with_aux, b, aux_c, z)
+    print('With BFS as: $\\bar{x} = ' + to_latex.bmatrix(bfs) + '$.\\\\ \n')
+
+
+    canon_A, canon_b, canon_c, canon_z = canonical.canonical(A_with_aux, b, aux_c, z, B)
+    new_A, new_b, new_c, new_z, new_B = find_optimal_solution(canon_A, canon_b, canon_c, canon_z, B)
+    
+    # if the aux elements in the "optimal" basis, then we know that there isn't any solution
+    for orig_basis_elem in B:
+        if(orig_basis_elem in new_B):
+            y = np.dot(np.linalg.inv(np.transpose(A_with_aux[:,B])), c[B])
+            print('This LP is not feasible. Here is the certificate: $y = ' + to_latex.bmatrix(y) + '$.')
+            raise NoSolution()
+    return B
 
 A = np.array([
     [2, -1, 2, 2],
@@ -98,14 +139,10 @@ c = np.array([
     [1],[2],[3],[4]
 ])
 z = 0
-B = [0, 1, 2]
+# B = [0, 1, 2]
+
+B = find_feasible_basis(A, b)
 
 # to_latex.print_lp(A, b, c, z)
 A, b, c, z = canonical.canonical(A, b, c, z, B)
 to_latex.print_lp(A, b, c, z)
-
-for itr in range(0, 100):
-    # do those 2 steps over and over until you win i guess...
-    B = find_better_basis(A, b, c, z, B)
-    A, b, c, z = canonical.canonical(A, b, c, z, B)
-    to_latex.print_lp(A, b, c, z)
