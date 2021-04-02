@@ -15,6 +15,9 @@ class NoSolution(Exception):
 
 # AKA, the major part of "PHASE 2" of simplex (requires that A, b, c, z, B are in canoncal form)
 def find_better_basis(A, b, c, z, B):
+    """
+    AKA, the major part of "PHASE 2" of simplex (requires that A, b, c, z, B are in canoncal form)
+    """
     all_elems = np.array(range(0, A.shape[1]))
     N = np.setxor1d(all_elems, B)
     c_N = c[N,:]
@@ -25,7 +28,7 @@ def find_better_basis(A, b, c, z, B):
         if(c_N_elem[0] > 0):
             c_N_leq_0 = False
     if(c_N_leq_0):
-        print('STOP! $c_N = ' + to_latex.bmatrix(c_N) + ' \\leq 0$. The basic solution $\\bar{x}$ is optimal')
+        print('STOP! $c_N = ' + to_latex.pmatrix(c_N) + ' \\leq 0$. The basic solution $\\bar{x}$ is optimal')
         raise OptimalBasicSolution(B)
     
     # pick k not in B such that c_k > 0 and set x_k = t
@@ -48,7 +51,7 @@ def find_better_basis(A, b, c, z, B):
         if(A_k_elem[0] > 0):
             A_k_leq_0 = False
     if(A_k_leq_0):
-        print('STOP! $A_k = ' + to_latex.bmatrix(A_k) + ' \\leq 0$. The LP is unbounded')
+        print('STOP! $A_k = ' + to_latex.pmatrix(A_k) + ' \\leq 0$. The LP is unbounded')
         # TODO: print out the "certificate"
         raise UnboundedSolution()
     
@@ -68,7 +71,7 @@ def find_better_basis(A, b, c, z, B):
 
     new_x_B = b - (t * A_k)
 
-    # print('$x_B = b - tA_k = ' + to_latex.bmatrix(b) + ' - ' + t.__str__() + to_latex.bmatrix(A_k) + ' = ' + to_latex.bmatrix(new_x_B) + '$ \\\\ \n')
+    # print('$x_B = b - tA_k = ' + to_latex.pmatrix(b) + ' - ' + t.__str__() + to_latex.pmatrix(A_k) + ' = ' + to_latex.pmatrix(new_x_B) + '$ \\\\ \n')
 
     r = -1
     for i in range(0, A_k.shape[0]):
@@ -111,7 +114,7 @@ def find_feasible_basis(A, b):
     bfs = np.append(np.zeros((1, A.shape[1])), np.transpose(b))
     print('We now have the auxiliary LP\\\\ \\n')
     to_latex.print_lp(A_with_aux, b, aux_c, z)
-    print('With BFS as: $\\bar{x} = ' + to_latex.bmatrix(bfs) + '$.\\\\ \n')
+    print('With BFS as: $\\bar{x} = ' + to_latex.pmatrix(bfs) + '$.\\\\ \n')
 
 
     canon_A, canon_b, canon_c, canon_z = canonical.canonical(A_with_aux, b, aux_c, z, B)
@@ -121,28 +124,8 @@ def find_feasible_basis(A, b):
     for orig_basis_elem in B:
         if(orig_basis_elem in new_B):
             y = np.dot(np.linalg.inv(np.transpose(A_with_aux[:,B])), c[B])
-            print('This LP is not feasible. Here is the certificate: $y = ' + to_latex.bmatrix(y) + '$.')
+            print('This LP is not feasible. Here is the certificate: $y = ' + to_latex.pmatrix(y) + '$.')
             raise NoSolution()
     return B
 
-A = np.array([
-    [2, -1, 2, 2],
-    [5, -2, 1, 3],
-    [0, 1, 0, -1]
-])
-b = np.array([
-        [4],
-        [11],
-        [2]
-])
-c = np.array([
-    [1],[2],[3],[4]
-])
-z = 0
-# B = [0, 1, 2]
 
-B = find_feasible_basis(A, b)
-
-# to_latex.print_lp(A, b, c, z)
-A, b, c, z = canonical.canonical(A, b, c, z, B)
-to_latex.print_lp(A, b, c, z)
